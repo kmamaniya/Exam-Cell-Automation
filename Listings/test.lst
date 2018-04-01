@@ -1,0 +1,465 @@
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE TEST
+OBJECT MODULE PLACED IN .\Objects\test.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE test.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\test
+                    -.lst) TABS(2) OBJECT(.\Objects\test.obj)
+
+line level    source
+
+   1          #include "Includes.h"
+   2          #include "DHT11.h"
+   3          #include <reg51.h>
+   4          #define debounceTime 1000
+   5          
+   6          long currentTime;
+   7          int alarmMode;
+   8          unsigned char dispArr1[7];
+   9          unsigned char dispArr[10];
+  10          sbit modepin = P0^0;
+  11          sbit changetens = P0^1;
+  12          sbit changeunits= P0^2;
+  13          sbit setpin = P0^3;
+  14          sbit AMLed = P3^2;
+  15          sbit PMLed = P3^3;
+  16          sbit buzzer = P3^4;
+  17          sbit latch = P3^0;
+  18          sbit finalspin = P0^5;
+  19          sbit unitspin = P0^4;
+  20          int flag=0;
+  21          unsigned char AlarmHH=1;
+  22          unsigned char AlarmMM=0;
+  23          unsigned char AlarmAP=0;
+  24          unsigned char YY1=20,YY2,MM,DD,HH,MIN,SS,AP;
+  25          int bitflag=0;
+  26          int timeset=0;
+  27          int alarmCount=0;
+  28          int units[]={85,600,660,705,720,780,795,810,870,885,900,960};   // Seconds the alarm should ring {min 1, ma
+             -x 59}
+  29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080};
+  30          
+  31          void CalculateTempTo7seg(unsigned char temp){
+  32   1        //Temperature
+  33   1        dispArr[8]=temp/10;
+  34   1        dispArr[9]=temp%10;
+  35   1      }
+  36          
+  37          void CalculateDateTo7seg(char * pDateArray){   // Displays date in DD:MM:YYYY format
+  38   1        //Date
+  39   1        
+  40   1        DD=pDateArray[1];
+  41   1        dispArr[0]=(char)(DD/10);
+  42   1        dispArr[1]=(char)(DD%10);
+  43   1        //Months
+  44   1        MM=pDateArray[2];
+  45   1        dispArr[2]=(char)(MM/10);
+  46   1        dispArr[3]=(char)(MM%10);
+  47   1        //Year
+  48   1        dispArr[4]=(char)YY1/10;
+  49   1        dispArr[5]=(char)YY1%10;
+  50   1        
+  51   1        YY2=pDateArray[3];
+  52   1        dispArr[6]=(char)(YY2/10);
+  53   1        dispArr[7]=(char)(YY2%10);
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 2   
+
+  54   1        YY2=pDateArray[3];
+  55   1      }
+  56          void CalculateTimeTo7seg(char *pTimeArray) {  // Displays date in DD:MM:YYYY format
+  57   1        //Hours
+  58   1        HH=pTimeArray[2];
+  59   1        dispArr1[0]=(HH/10);
+  60   1        dispArr1[1]=(HH%10);
+  61   1        //Minutes
+  62   1        MIN=pTimeArray[1];
+  63   1        dispArr1[2]=(MIN/10);
+  64   1        dispArr1[3]=(MIN%10);
+  65   1        //Seconds
+  66   1        SS=pTimeArray[0];
+  67   1        dispArr1[4]=(SS/10);
+  68   1        dispArr1[5]=(SS%10);
+  69   1        //AM PM
+  70   1        AP=(unsigned char)pTimeArray[3];
+  71   1        dispArr1[6]=AP;
+  72   1        currentTime = 60*HH+MIN+AP*720;
+  73   1        if(HH==12)
+  74   1          currentTime-=720;
+  75   1      }
+  76          
+  77          
+  78          
+  79          void display(){
+  80   1        char i;
+  81   1        
+  82   1        if(dispArr1[6]==1){
+  83   2          PMLed=1;delay(100);
+  84   2          AMLed=0;
+  85   2        }
+  86   1        else if(dispArr1[6]==0){
+  87   2          PMLed=0;delay(100);
+  88   2          AMLed=1;
+  89   2        }
+  90   1        else{
+  91   2          PMLed=0;delay(100);
+  92   2          AMLed=0;
+  93   2        }
+  94   1        
+  95   1        for(i=0;i<10;i++){
+  96   2          P1 = dispArr[i];
+  97   2          delay(10);
+  98   2          P2 = (unsigned char)i;
+  99   2          delay(10);
+ 100   2          latch=0;
+ 101   2          delay(10);
+ 102   2          latch=1;
+ 103   2          delay(10);
+ 104   2        }
+ 105   1        for(i=0;i<6;i++){
+ 106   2          P1 = dispArr1[i];
+ 107   2          delay(10);
+ 108   2          P2 = (unsigned char)(i+10);
+ 109   2          delay(10);
+ 110   2          latch=0;
+ 111   2          delay(10);
+ 112   2          latch=1;
+ 113   2          delay(10);
+ 114   2        }
+ 115   1      }
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 3   
+
+ 116          
+ 117          void setTime(){
+ 118   1        int i;
+ 119   1        timeset=0;
+ 120   1        bitflag=0;
+ 121   1          while(1){
+ 122   2              if(modepin==0){
+ 123   3                delay(debounceTime);
+ 124   3                if(modepin==0){
+ 125   4                  while(modepin!=1);
+ 126   4                  flag = 2;
+ 127   4                  if(timeset==1)
+ 128   4                    Set_DS1307_RTC_Time(AP,HH,MIN,SS);
+ 129   4                  Set_DS1307_RTC_Date(DD,MM,YY2,4);
+ 130   4                  break;
+ 131   4                }
+ 132   3              }       
+ 133   2              for(i=0;i<10;i++)
+ 134   2                dispArr[i]=0;
+ 135   2              
+ 136   2              dispArr1[0]=HH/10;
+ 137   2              dispArr1[1]=HH%10;
+ 138   2              dispArr1[2]=MIN/10;
+ 139   2              dispArr1[3]=MIN%10;
+ 140   2              dispArr1[4]=SS/10;
+ 141   2              dispArr1[5]=SS%10;
+ 142   2              dispArr1[6]=AP;
+ 143   2              display();
+ 144   2              
+ 145   2              if(changetens==0){
+ 146   3                delay(debounceTime);
+ 147   3                if(changetens==0){
+ 148   4                  timeset=1;
+ 149   4                  while(changetens!=1);
+ 150   4                  switch(bitflag){
+ 151   5                    case 0: HH+=10;
+ 152   5                            if(HH>12)
+ 153   5                              HH%=10;
+ 154   5                            break;
+ 155   5                    case 1: MIN+=10;
+ 156   5                            if(MIN>=60)
+ 157   5                              MIN%=10;
+ 158   5                            break;
+ 159   5                    case 2: SS+=10;
+ 160   5                            if(SS>=60)
+ 161   5                              SS%=10;
+ 162   5                            break;
+ 163   5                    case 3: AP++;
+ 164   5                            AP%=2;
+ 165   5                    default: break;
+ 166   5                  }
+ 167   4                }
+ 168   3              }
+ 169   2              if(changeunits==0){
+ 170   3                delay(debounceTime);
+ 171   3                if(changeunits==0){
+ 172   4                  timeset=1;
+ 173   4                  while(changeunits!=1);
+ 174   4                  switch(bitflag){
+ 175   5                    case 0: HH++;
+ 176   5                            if(HH>12)
+ 177   5                              HH=1;
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 4   
+
+ 178   5                            break;
+ 179   5                    case 1: MIN++;
+ 180   5                            MIN=MIN%60;
+ 181   5                            break;
+ 182   5                    case 2: SS++;
+ 183   5                            SS=SS%60;
+ 184   5                            break;
+ 185   5                    case 3: AP++;
+ 186   5                            AP%=2;
+ 187   5                    default: break;
+ 188   5                  }
+ 189   4                }
+ 190   3              }
+ 191   2            if(setpin==0){
+ 192   3              delay(debounceTime);
+ 193   3              if(setpin==0){
+ 194   4                while(setpin!=1);
+ 195   4                bitflag++;
+ 196   4                bitflag%=4;
+ 197   4              }
+ 198   3            }
+ 199   2            delay(100);
+ 200   2          }
+ 201   1      }
+ 202          
+ 203          void setDate(){
+ 204   1          int i;
+ 205   1          bitflag=0;
+ 206   1          while(flag<2){
+ 207   2          for(i=0;i<6;i++)
+ 208   2            dispArr1[i]=0;
+ 209   2          dispArr1[6]=2;  
+ 210   2          dispArr[8]=0;
+ 211   2          dispArr[9]=0;
+ 212   2          dispArr[0]=DD/10;
+ 213   2          dispArr[1]=DD%10;
+ 214   2          dispArr[2]=MM/10;
+ 215   2          dispArr[3]=MM%10;
+ 216   2          dispArr[4]=YY1/10;
+ 217   2          dispArr[5]=YY1%10;
+ 218   2          dispArr[6]=YY2/10;
+ 219   2          dispArr[7]=YY2%10;
+ 220   2          display();
+ 221   2            
+ 222   2          if(changetens==0){
+ 223   3            delay(debounceTime);
+ 224   3            if(changetens==0){
+ 225   4              while(changetens!=1);
+ 226   4              switch(bitflag){
+ 227   5                case 0: DD+=10;
+ 228   5                        if(DD>31)
+ 229   5                          DD%=10;
+ 230   5                        break;
+ 231   5                case 1: MM+=10;
+ 232   5                        if(MM>12)
+ 233   5                          MM%=10;
+ 234   5                        break;
+ 235   5                case 2: YY1+=10;
+ 236   5                        if(YY1>99)
+ 237   5                          YY1%=10;
+ 238   5                        break;
+ 239   5                case 3: YY2+=10;
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 5   
+
+ 240   5                        if(YY2>99)
+ 241   5                          YY2%=10;
+ 242   5                default: break;
+ 243   5              }
+ 244   4            }
+ 245   3          }
+ 246   2          if(changeunits==0){
+ 247   3            delay(debounceTime);
+ 248   3            if(changeunits==0){
+ 249   4              while(changeunits!=1);
+ 250   4              switch(bitflag){
+ 251   5                case 0: DD++;
+ 252   5                        if(DD>31)
+ 253   5                          DD=1;
+ 254   5                        break;
+ 255   5                case 1: MM++;
+ 256   5                        if(MM>12)
+ 257   5                          MM=1;
+ 258   5                        break;
+ 259   5                case 2: YY1++;
+ 260   5                        YY1%=100;
+ 261   5                        break;
+ 262   5                case 3: YY2++;
+ 263   5                        YY2%=100;
+ 264   5                default: break;
+ 265   5              }
+ 266   4            }
+ 267   3          }
+ 268   2          if(setpin==0){
+ 269   3            delay(debounceTime);
+ 270   3            if(setpin==0){
+ 271   4              while(setpin!=1);
+ 272   4              bitflag++;
+ 273   4              bitflag%=4;
+ 274   4            }
+ 275   3          }
+ 276   2          if(modepin==0){
+ 277   3            delay(debounceTime);
+ 278   3            if(modepin==0){
+ 279   4              while(modepin!=1);
+ 280   4              setTime();
+ 281   4            }
+ 282   3          }
+ 283   2          delay(100);
+ 284   2        } 
+ 285   1      }
+ 286          
+ 287          
+ 288          /*void setAlarm(){
+ 289              int i=0;
+ 290              bitflag=0;
+ 291              while(flag<2){
+ 292                for(i=0;i<10;i++)
+ 293                  dispArr[i]=0;
+ 294                
+ 295                dispArr1[0]=AlarmHH/10;
+ 296                dispArr1[1]=AlarmHH%10;
+ 297                dispArr1[2]=AlarmMM/10;
+ 298                dispArr1[3]=AlarmMM%10;
+ 299                dispArr1[4]=0;
+ 300                dispArr1[5]=0;
+ 301                dispArr1[6]=AlarmAP;
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 6   
+
+ 302                display();
+ 303                if(changetens==0){
+ 304                    while(changetens!=1 );
+ 305                    if(bitflag==0){
+ 306                      AlarmHH+=10;
+ 307                      if(AlarmHH>12)
+ 308                        AlarmHH%=10;
+ 309                    }
+ 310                    else if(bitflag==1){
+ 311                      AlarmMM+=10;
+ 312                      if(AlarmMM>=60)
+ 313                        AlarmMM%=10;
+ 314                    }
+ 315                    
+ 316                    else {
+ 317                        AlarmAP++;
+ 318                        AlarmAP%=2;
+ 319                    }
+ 320                }
+ 321                if(changeunits==0){
+ 322                    while(changeunits!=1);
+ 323                    if(bitflag==0){
+ 324                      AlarmHH++;
+ 325                      if(AlarmHH>12)
+ 326                        AlarmHH=1;
+ 327                    }
+ 328                    else if(bitflag==1){
+ 329                      AlarmMM++;
+ 330                      AlarmMM%=60;
+ 331                    }
+ 332                    else {
+ 333                        AlarmAP++;
+ 334                        AlarmAP%=2;
+ 335                    }
+ 336                  }
+ 337                if(setpin==0){
+ 338                  while(setpin!=1);
+ 339                  bitflag++;
+ 340                  bitflag%=3;
+ 341                }
+ 342                if(modepin==0){
+ 343                    while(modepin!=1);
+ 344                    setDate();
+ 345                }
+ 346                delay(100);
+ 347              }
+ 348              AlarmTime=60*AlarmHH+AlarmMM + AlarmAP*720;
+ 349              flag=0;
+ 350          }*/
+ 351          
+ 352          
+ 353          int getAlarmCount(int mode){
+ 354   1        int i=0;
+ 355   1        if(mode==1){
+ 356   2          for(i=0;i<12;i++)
+ 357   2            if(currentTime<=units[i])
+ 358   2              break;
+ 359   2          if(i==12)
+ 360   2            return 0;
+ 361   2          else return i;
+ 362   2          }
+ 363   1        else if(mode==2){
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 7   
+
+ 364   2          for(i=0;i<12;i++)
+ 365   2            if(currentTime<=finals[i])
+ 366   2              break;
+ 367   2          if(i==12)
+ 368   2            return 0;
+ 369   2          else return i;
+ 370   2          }
+ 371   1        else return -1;
+ 372   1      }
+ 373          
+ 374          int setAlarmMode(){
+ 375   1        if(unitspin==0 && finalspin==1)
+ 376   1          return 1;
+ 377   1        else if(unitspin==1 && finalspin==0)
+ 378   1          return 2;
+ 379   1        else 
+ 380   1          return 0;
+ 381   1      }
+ 382          
+ 383          void setAlarm(){
+ 384   1        if(alarmMode==1 && units[alarmCount]== currentTime && SS<15)      
+ 385   1            buzzer=0;
+ 386   1        else if(alarmMode==2 && finals[alarmCount]== currentTime && SS<15)      
+ 387   1            buzzer=0;
+ 388   1        else buzzer=1;
+ 389   1      }
+ 390          
+ 391          // Main function
+ 392          void main()
+ 393          { 
+ 394   1        alarmCount=0;
+ 395   1        alarmMode=1;
+ 396   1        modepin=1;
+ 397   1        changeunits=1;
+ 398   1        changetens=1;
+ 399   1        setpin=1;
+ 400   1        unitspin=1;
+ 401   1        finalspin=1;
+ 402   1        InitI2C();  // Initialize i2c pins  
+ 403   1        flag=0;
+ 404   1        //set initial time
+ 405   1        //Set_DS1307_RTC_Time(PM_Time, 12, 59, 58); // Set time 
+ 406   1        //Set initial date
+ 407   1        //Set_DS1307_RTC_Date(24, 8, 17, 0);  // Set Set 24-08-2017
+ 408   1        while(1){
+ 409   2          flag=0;
+ 410   2          CalculateDateTo7seg(Get_DS1307_RTC_Date());
+ 411   2          CalculateTimeTo7seg(Get_DS1307_RTC_Time());
+ 412   2          CalculateTempTo7seg(12);
+ 413   2          display();
+ 414   2          //alarmMode=setAlarmMode();
+ 415   2          alarmCount=getAlarmCount(alarmMode);
+ 416   2          setAlarm();
+ 417   2          if(modepin==0){
+ 418   3            delay(debounceTime);
+ 419   3            if(modepin==0){
+ 420   4              while(modepin!=1);
+ 421   4              setDate();
+ 422   4            }
+ 423   3          }
+ 424   2          delay(6500);
+ 425   2        }
+C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 8   
+
+ 426   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1743    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =    100       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
