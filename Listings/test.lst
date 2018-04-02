@@ -1,4 +1,4 @@
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 1   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 1   
 
 
 C51 COMPILER V9.56.0.0, COMPILATION OF MODULE TEST
@@ -35,8 +35,8 @@ line level    source
   25          int bitflag=0;
   26          int timeset=0;
   27          int alarmCount=0;
-  28          int units[]={85,600,660,705,720,780,795,810,870,885,900,960};   // Seconds the alarm should ring {min 1, ma
-             -x 59}
+  28          int units[]={585,600,660,705,720,780,795,810,870,885,900,960};    // Seconds the alarm should ring {min 1, m
+             -ax 59}
   29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080};
   30          
   31          void CalculateTempTo7seg(unsigned char temp){
@@ -62,7 +62,7 @@ line level    source
   51   1        YY2=pDateArray[3];
   52   1        dispArr[6]=(char)(YY2/10);
   53   1        dispArr[7]=(char)(YY2%10);
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 2   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 2   
 
   54   1        YY2=pDateArray[3];
   55   1      }
@@ -126,7 +126,7 @@ line level    source
  113   2          delay(10);
  114   2        }
  115   1      }
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 3   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 3   
 
  116          
  117          void setTime(){
@@ -190,7 +190,7 @@ line level    source
  175   5                    case 0: HH++;
  176   5                            if(HH>12)
  177   5                              HH=1;
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 4   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 4   
 
  178   5                            break;
  179   5                    case 1: MIN++;
@@ -254,7 +254,7 @@ line level    source
  237   5                          YY1%=10;
  238   5                        break;
  239   5                case 3: YY2+=10;
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 5   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 5   
 
  240   5                        if(YY2>99)
  241   5                          YY2%=10;
@@ -318,7 +318,7 @@ line level    source
  299                dispArr1[4]=0;
  300                dispArr1[5]=0;
  301                dispArr1[6]=AlarmAP;
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 6   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 6   
 
  302                display();
  303                if(changetens==0){
@@ -382,7 +382,7 @@ line level    source
  361   2          else return i;
  362   2          }
  363   1        else if(mode==2){
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 7   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 7   
 
  364   2          for(i=0;i<12;i++)
  365   2            if(currentTime<=finals[i])
@@ -432,7 +432,7 @@ line level    source
  409   2          flag=0;
  410   2          CalculateDateTo7seg(Get_DS1307_RTC_Date());
  411   2          CalculateTimeTo7seg(Get_DS1307_RTC_Time());
- 412   2          CalculateTempTo7seg(12);
+ 412   2          CalculateTempTo7seg(getTemp());
  413   2          display();
  414   2          //alarmMode=setAlarmMode();
  415   2          alarmCount=getAlarmCount(alarmMode);
@@ -446,13 +446,13 @@ line level    source
  423   3          }
  424   2          delay(6500);
  425   2        }
-C51 COMPILER V9.56.0.0   TEST                                                              04/01/2018 09:22:40 PAGE 8   
+C51 COMPILER V9.56.0.0   TEST                                                              04/02/2018 14:35:12 PAGE 8   
 
  426   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1743    ----
+   CODE SIZE        =   1744    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

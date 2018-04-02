@@ -25,7 +25,7 @@ unsigned char YY1=20,YY2,MM,DD,HH,MIN,SS,AP;
 int bitflag=0;
 int timeset=0;
 int alarmCount=0;
-int units[]={85,600,660,705,720,780,795,810,870,885,900,960};		// Seconds the alarm should ring {min 1, max 59}
+int units[]={585,600,660,705,720,780,795,810,870,885,900,960};		// Seconds the alarm should ring {min 1, max 59}
 int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080};
 
 void CalculateTempTo7seg(unsigned char temp){
@@ -409,7 +409,7 @@ void main()
 		flag=0;
 		CalculateDateTo7seg(Get_DS1307_RTC_Date());
 		CalculateTimeTo7seg(Get_DS1307_RTC_Time());
-		CalculateTempTo7seg(12);
+		CalculateTempTo7seg(getTemp());
 		display();
 		//alarmMode=setAlarmMode();
 		alarmCount=getAlarmCount(alarmMode);
