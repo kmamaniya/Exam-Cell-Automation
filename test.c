@@ -1,7 +1,7 @@
 #include "Includes.h"
 #include "DHT11.h"
 #include <reg51.h>
-#define debounceTime 1000
+#define debounceTime 5000
 
 long currentTime;
 int alarmMode;
@@ -25,8 +25,8 @@ unsigned char YY1=20,YY2,MM,DD,HH,MIN,SS,AP;
 int bitflag=0;
 int timeset=0;
 int alarmCount=0;
-int units[]={585,600,660,705,720,780,795,810,870,885,900,960};		// Seconds the alarm should ring {min 1, max 59}
-int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080};
+int units[]={585,600,660,705,720,780,795,810,870,885,900,960};		// 945,1000,1100,1145,1200,1300,1330,1355,1430,1445,1500,1600
+int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080}; //1045,1100,1200,1250,1300,1345,1400,1500,1600,1650,1700
 
 void CalculateTempTo7seg(unsigned char temp){
 	//Temperature
@@ -409,9 +409,9 @@ void main()
 		flag=0;
 		CalculateDateTo7seg(Get_DS1307_RTC_Date());
 		CalculateTimeTo7seg(Get_DS1307_RTC_Time());
-		CalculateTempTo7seg(getTemp());
+		CalculateTempTo7seg(12);
 		display();
-		//alarmMode=setAlarmMode();
+		alarmMode=setAlarmMode();
 		alarmCount=getAlarmCount(alarmMode);
 		setAlarm();
 		if(modepin==0){
@@ -421,6 +421,6 @@ void main()
 				setDate();
 			}
 		}
-		delay(6500);
+		delay(65000);
 	}
 }
