@@ -1,4 +1,4 @@
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 1   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 1   
 
 
 C51 COMPILER V9.56.0.0, COMPILATION OF MODULE TEST
@@ -35,9 +35,10 @@ line level    source
   25          int bitflag=0;
   26          int timeset=0;
   27          int alarmCount=0;
-  28          int units[]={585,600,660,705,720,780,795,810,870,885,900,960};    // Seconds the alarm should ring {min 1, m
-             -ax 59}
-  29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080};
+  28          int units[]={585,600,660,705,720,780,795,810,870,885,900,960};    // 945,1000,1100,1145,1200,1300,1330,1355,
+             -1430,1445,1500,1600
+  29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080}; //1045,1100,1200,1250,1300,1345,1400,15
+             -00,1600,1650,1700
   30          
   31          void CalculateTempTo7seg(unsigned char temp){
   32   1        //Temperature
@@ -61,9 +62,9 @@ line level    source
   50   1        
   51   1        YY2=pDateArray[3];
   52   1        dispArr[6]=(char)(YY2/10);
-  53   1        dispArr[7]=(char)(YY2%10);
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 2   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 2   
 
+  53   1        dispArr[7]=(char)(YY2%10);
   54   1        YY2=pDateArray[3];
   55   1      }
   56          void CalculateTimeTo7seg(char *pTimeArray) {  // Displays date in DD:MM:YYYY format
@@ -125,9 +126,9 @@ line level    source
  112   2          latch=1;
  113   2          delay(10);
  114   2        }
- 115   1      }
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 3   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 3   
 
+ 115   1      }
  116          
  117          void setTime(){
  118   1        int i;
@@ -189,9 +190,9 @@ line level    source
  174   4                  switch(bitflag){
  175   5                    case 0: HH++;
  176   5                            if(HH>12)
- 177   5                              HH=1;
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 4   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 4   
 
+ 177   5                              HH=1;
  178   5                            break;
  179   5                    case 1: MIN++;
  180   5                            MIN=MIN%60;
@@ -253,9 +254,9 @@ line level    source
  236   5                        if(YY1>99)
  237   5                          YY1%=10;
  238   5                        break;
- 239   5                case 3: YY2+=10;
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 5   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 5   
 
+ 239   5                case 3: YY2+=10;
  240   5                        if(YY2>99)
  241   5                          YY2%=10;
  242   5                default: break;
@@ -317,9 +318,9 @@ line level    source
  298                dispArr1[3]=AlarmMM%10;
  299                dispArr1[4]=0;
  300                dispArr1[5]=0;
- 301                dispArr1[6]=AlarmAP;
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 6   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 6   
 
+ 301                dispArr1[6]=AlarmAP;
  302                display();
  303                if(changetens==0){
  304                    while(changetens!=1 );
@@ -381,9 +382,9 @@ line level    source
  360   2            return 0;
  361   2          else return i;
  362   2          }
- 363   1        else if(mode==2){
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 7   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 7   
 
+ 363   1        else if(mode==2){
  364   2          for(i=0;i<12;i++)
  365   2            if(currentTime<=finals[i])
  366   2              break;
@@ -432,9 +433,9 @@ line level    source
  409   2          flag=0;
  410   2          CalculateDateTo7seg(Get_DS1307_RTC_Date());
  411   2          CalculateTimeTo7seg(Get_DS1307_RTC_Time());
- 412   2          CalculateTempTo7seg(getTemp());
+ 412   2          CalculateTempTo7seg(12);
  413   2          display();
- 414   2          //alarmMode=setAlarmMode();
+ 414   2          alarmMode=setAlarmMode();
  415   2          alarmCount=getAlarmCount(alarmMode);
  416   2          setAlarm();
  417   2          if(modepin==0){
@@ -445,14 +446,14 @@ line level    source
  422   4            }
  423   3          }
  424   2          delay(65000);
- 425   2        }
-C51 COMPILER V9.56.0.0   TEST                                                              04/04/2018 15:34:52 PAGE 8   
+C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 8   
 
+ 425   2        }
  426   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1744    ----
+   CODE SIZE        =   1746    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
