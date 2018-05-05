@@ -1,4 +1,4 @@
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 1   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 1   
 
 
 C51 COMPILER V9.56.0.0, COMPILATION OF MODULE TEST
@@ -37,8 +37,8 @@ line level    source
   27          int alarmCount=0;
   28          int units[]={585,600,660,705,720,780,795,810,870,885,900,960};    // 945,1000,1100,1145,1200,1300,1330,1355,
              -1430,1445,1500,1600
-  29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080}; //1045,1100,1200,1250,1300,1345,1400,15
-             -00,1600,1650,1700
+  29          int finals[]={645,660,720,780,830,840,885,900,960,1020,1070,1080}; //1045,1100,1200,1300,1350,1400,1445,15
+             -00,1600,1700,1750,1800
   30          
   31          void CalculateTempTo7seg(unsigned char temp){
   32   1        //Temperature
@@ -62,7 +62,7 @@ line level    source
   50   1        
   51   1        YY2=pDateArray[3];
   52   1        dispArr[6]=(char)(YY2/10);
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 2   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 2   
 
   53   1        dispArr[7]=(char)(YY2%10);
   54   1        YY2=pDateArray[3];
@@ -126,7 +126,7 @@ line level    source
  112   2          latch=1;
  113   2          delay(10);
  114   2        }
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 3   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 3   
 
  115   1      }
  116          
@@ -190,7 +190,7 @@ line level    source
  174   4                  switch(bitflag){
  175   5                    case 0: HH++;
  176   5                            if(HH>12)
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 4   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 4   
 
  177   5                              HH=1;
  178   5                            break;
@@ -254,7 +254,7 @@ line level    source
  236   5                        if(YY1>99)
  237   5                          YY1%=10;
  238   5                        break;
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 5   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 5   
 
  239   5                case 3: YY2+=10;
  240   5                        if(YY2>99)
@@ -318,7 +318,7 @@ line level    source
  298                dispArr1[3]=AlarmMM%10;
  299                dispArr1[4]=0;
  300                dispArr1[5]=0;
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 6   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 6   
 
  301                dispArr1[6]=AlarmAP;
  302                display();
@@ -382,7 +382,7 @@ line level    source
  360   2            return 0;
  361   2          else return i;
  362   2          }
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 7   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 7   
 
  363   1        else if(mode==2){
  364   2          for(i=0;i<12;i++)
@@ -446,7 +446,7 @@ line level    source
  422   4            }
  423   3          }
  424   2          delay(65000);
-C51 COMPILER V9.56.0.0   TEST                                                              04/05/2018 14:39:30 PAGE 8   
+C51 COMPILER V9.56.0.0   TEST                                                              05/05/2018 11:52:23 PAGE 8   
 
  425   2        }
  426   1      }
